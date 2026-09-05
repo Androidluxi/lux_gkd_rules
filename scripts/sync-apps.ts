@@ -54,6 +54,7 @@ const SYNC_APPS = [
   'com.xunmeng.pinduoduo',
   // 工具/音乐/其他
   'com.netease.cloudmusic',
+  'com.tencent.qqmusic',
   'com.coolapk.market',
   'com.zhihu.android',
 ];
