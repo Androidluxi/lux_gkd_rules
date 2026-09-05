@@ -1,166 +1,68 @@
-# subscription-template
+# lux_gkd_rules
 
-GKD 订阅模板, 此仓库方便您直接构建自己订阅, 点击右上角 [Use this template](https://github.com/new?template_name=subscription-template&template_owner=gkd-kit) 即可使用
+为我的小米 17 (HyperOS) 定制的 [GKD](https://gkd.li) 订阅规则仓库。规则精选自上游聚合订阅, 并按自己手机实际情况持续调整。
 
-## 配置环境
+## 订阅地址
 
-请安装最新版 nodejs 和 pnpm 运行, 以及使用 vscode 打开项目
+GKD App → 订阅 → 添加, 任选其一:
 
-> [!IMPORTANT]
-> 选择器需要使用 nodejs@22 的 WasmGc 来校验 Java/Kotlin 正则表达式, 确保使用 nodejs>=22
-
-- nodejs>=**22** <https://nodejs.org/en/download>
-- pnpm>=9 <https://pnpm.io/zh/installation>
-- vscode <https://code.visualstudio.com>
-
-安装好后使用模板, 假设您刚刚使用 `Use this template` 创建的仓库是 `https://github.com/username/subscription`
-
-接下来下载并初始化环境
-
-```shell
-git clone https://github.com/username/subscription
-cd subscription
-pnpm install
+```txt
+https://raw.githubusercontent.com/Androidluxi/lux_gkd_rules/main/dist/gkd.json5
 ```
 
-如果因为网络问题安装失败, 将上面的 `pnpm install` 换成下面命令使用 阿里镜像源 重新安装即可
+大陆镜像:
 
-```sh
-pnpm install --registry=https://registry.npmmirror.com
+```txt
+https://fastly.jsdelivr.net/gh/Androidluxi/lux_gkd_rules@main/dist/gkd.json5
 ```
-
-![image](https://e.gkd.li/33bb6379-2fae-4139-abc3-6250a287ad84)
-
-至此环境已在 `subscription` 目录下初始化完毕, 使用 vscode 打开目录即可开始开发
-
-接下来下面所有的示例链接都基于 `username/subscription`, 请自行替换后打开
-
-`pnpm install` 用于安装依赖, 如果您的 [./package.json](./package.json) 发生变化, 则需要再次运行 `pnpm install`
-
----
-
-如果您无法初始化 nodejs 环境, 那可以直接使用 github 网页编辑文件后在线提交, 点击下面链接即可在线编辑
-
-<https://github.com/username/subscription/edit/main/src/subscription.ts>
-
-![image](https://e.gkd.li/bb539a50-cbdb-4fec-8a93-4a9c5d067de0)
 
 ## 目录结构
 
 - 订阅详情 [./src/subscription.ts](./src/subscription.ts)
-- 全局规则 [./src/globalGroups.ts](./src/globalGroups.ts)
+- 全局规则 (开屏广告/更新提示/青少年模式) [./src/globalGroups.ts](./src/globalGroups.ts)
+- 全局规则黑名单 (这些应用内禁用全局规则) [./src/globalDefaultApps.ts](./src/globalDefaultApps.ts)
 - 规则分类 [./src/categories.ts](./src/categories.ts)
-- 应用规则 [./src/apps](./src/apps/)
+- 应用规则 [./src/apps](./src/apps/) — 每个应用一个文件, 文件名为包名
+- 构建产物 [./dist](./dist/)
 
-在 vscode 内使用鼠标悬浮在任意字段上即可查看注释说明, 也可在 <https://gkd.li/api> 搜索查看
+收录范围: 小米系统应用 (手机管家、系统广告、应用商店、安装器、相册、云服务等) + 常用应用 (微信、QQ、抖音、快手、B站、小红书、淘宝、京东、拼多多、网易云、酷安、知乎)。
 
-![image](https://e.gkd.li/3b3c8b14-f7f4-46ee-90dc-b69b9233f993)
+## 按自己手机的实际情况更新规则
 
-现在您可编辑 [./src](./src/) 下的文件来自定义您的订阅, 构建后的订阅文件处于 [./dist](./dist/) 目录下
+### 方式一: 从上游同步最新规则
 
-另外您必须修改 订阅详情 [./src/subscription.ts](./src/subscription.ts) 下的 id 字段, 否则可能会和其它订阅冲突, 填一个较大的随机数字即可
+规则源文件来自 [Lin-arm/GKD_subscription](https://github.com/Lin-arm/GKD_subscription), 需要更新时运行:
 
-可以在 github 查找下方代码块 ([快捷链接](https://github.com/search?q=export+default+defineGkdSubscription%28%7B+++id%3A+&type=code)), 查看您的订阅id是否跟已有项目重复
-
-```ts
-export default defineGkdSubscription({
-  id:
+```shell
+pnpm sync                    # 同步全部跟踪列表中的应用
+pnpm sync com.xxx.yyy        # 临时同步列表外的应用
 ```
 
-## 格式修复
+同步后用 `git diff` 检查变化, 在 GKD 里实测, 误触或不生效的规则直接改 `src/apps/` 下对应文件 (小米 17 的 HyperOS 与上游适配的 MIUI/HyperOS 版本可能有差异)。
 
-我们使用 [prettier](https://github.com/prettier/prettier) 来格式化代码 和 [eslint](https://github.com/eslint/eslint) 来检测并修复代码错误
+### 方式二: 自己抓快照写规则
 
-同时使用 [simple-git-hooks](https://github.com/toplenboren/simple-git-hooks) 在您提交代码时运行格式化和代码检测修复脚本
+上游没有覆盖、或在你手机上失效的界面:
 
-当您的代码存在错误时, 它会阻止您提交代码并输出具体错误以供您手动修复后再次提交
+1. GKD App 内对目标界面**保存快照**
+2. 打开 [GKD 快照审查工具](https://gkd.li/inspector/) 导入快照, 生成选择器
+3. 写入 `src/apps/<包名>.ts` 对应应用的 `groups` 中 (没有该文件就新建一个, 参考 [apps/com.tencent.mm.ts](./src/apps/com.tencent.mm.ts) 的结构)
+4. 分组命名以 `开屏广告` 开头会自动排到全局开屏规则之前
 
-当提交代码到仓库时, 我们也需要使用 github actions 来帮助自动格式化并修复代码, 因此您需要开启仓库的此项权限
+### 提交与发布
 
-打开 <https://github.com/username/subscription/settings/actions>
+直接 push 到 `main` 即可, GitHub Actions 会自动格式化并构建发布 (需在仓库 Settings → Actions → Workflow permissions 开启 Read and write permissions)。也可以本地运行:
 
-然后找到 Workflow permissions 点击 Read and write permissions 然后点击下方的 Save 即可
-
-![image](https://e.gkd.li/89dd8c22-f3f0-4331-a3d1-03d466dcc3d6)
-
-## 构建订阅
-
-我们需要将 [./src](./src/) 分散的文件合并为一个 gkd.json5 的最终订阅文件并输出到 [./dist](./dist/) 目录下
-
-推荐使用 github actions 进行构建, 在 [./.github/workflows](./.github/workflows) 下有 3 个工作流
-
-我们使用其中的 `build_release.yml` 构建并发布
-
-打开 <https://github.com/username/subscription/actions/workflows/build_release.yml>
-
-然后点击右侧的 `Run workflow` 即可运行并发布
-
-![image](https://e.gkd.li/ab202786-d56d-4dba-a5ee-03190aafb6e6)
-
-构建后订阅将输出到 dist 目录下, gkd.json 的文件订阅地址如下, 复制后到 GKD 添加即可
-
-```txt
-https://raw.githubusercontent.com/username/subscription/main/dist/gkd.json5
+```shell
+pnpm check   # 类型检查 + 规则校验
+pnpm build   # 构建到 dist/
 ```
 
-## 镜像加速
+## 环境
 
-raw.githubusercontent.com 在大陆的访问常常无法访问
+- nodejs>=**22** (选择器中的 Java/Kotlin 正则需要 node 22 的 WasmGc 校验)
+- pnpm>=9
 
-您可以换成 <https://fastly.jsdelivr.net/gh/username/subscription@main/dist/gkd.json5> 加速访问
-
-如果无法访问 raw.githubusercontent.com 和 fastly.jsdelivr.net
-
-请自行解决网络问题
-
-## 自定义配置文件
-
-注意: **大多数情况下, 你不需要自定义, 使用默认配置时, 下面此节教程无需了解**
-
-你可以在 [./package.json](./package.json) 下添加 gkd 属性配置自定义构建选项
-
-```json
-{
-  "gkd": {
-    "outDir": "dist",
-    "file": "gkd.json5",
-    "versionFile": "gkd.version.json5",
-    "changelog": "CHANGELOG.md",
-    "README.md": "README.md"
-  }
-}
+```shell
+pnpm install   # 网络问题可加 --registry=https://registry.npmmirror.com
 ```
-
-这个 gkd 属性的类型如下
-
-```ts
-/**
- * @default package.json.gkd
- */
-type GkdConfig = {
-  /**
-   * @default 'dist'
-   */
-  outDir?: string;
-  /**
-   * @default 'gkd.json5'
-   */
-  file?: string;
-  /**
-   * @default 'gkd.version.json5'
-   */
-  versionFile?: string;
-  /**
-   * @default 'CHANGELOG.md'
-   */
-  changelog?: string;
-  /**
-   * @default 'README.md'
-   */
-  readme?: string;
-};
-```
-
-如果不想写配置文件, 也可以将这个参数直接传递给 `@gkd-kit/tools` 的 `updateDist` 函数
-
-手动传递参数的时候, 你必须显式将路径(非文件名)参数传递给 [./.github/workflows/build_release.yml](./.github/workflows/build_release.yml) 下的 `updatePkgVersion` 和 `stdoutGkdVersion` 函数

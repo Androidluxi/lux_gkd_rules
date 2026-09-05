@@ -21,3 +21,7 @@ lerna-debug.log*
 node_modules
 package-lock.json
 yarn.lock
+
+# 本地 pnpm 缓存 (沙箱环境下 store 需放在工作区内)
+.pnpm-store
+.pnpm-cache
